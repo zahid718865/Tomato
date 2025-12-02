@@ -1,7 +1,6 @@
-numpy
-pillow
-opencv-python
+numpy==1.26.4
+pillow==10.3.0
+opencv-python-headless==4.9.0.80
 python-telegram-bot==13.15
 tensorflow==2.17.0
-scikit-learn
-matplotlib
+scikit-learn==1.3.2
