@@ -1,31 +1,24 @@
-# Use Python 3.10 (TensorFlow compatible)
-FROM python:3.10-slim
+FROM python:3.10-slim-bookworm
 
-# Prevent Python from writing .pyc files
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies
+# Install required system libs
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
 WORKDIR /app
 
-# Copy requirements
-COPY requirements.txt .
+COPY requirements.txt /app/
 
-# Install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all project files
-COPY . .
+COPY . /app/
 
-# Expose port (not used by Telegram Bot, but Render needs it)
-EXPOSE 10000
-
-# Start the bot
 CMD ["python", "bot.py"]
