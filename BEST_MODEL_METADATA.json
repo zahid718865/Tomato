@@ -1,7 +1,7 @@
 {
     "best_model_name": "DenseNet121",
     "num_classes": 10,
-    "image_size": [224, 224],
+    "image_size": [256, 256],
     "class_names": [
         "Bacterial Spot",
         "Early Blight",
@@ -13,5 +13,6 @@
         "Mosaic Virus",
         "Yellow Leaf Curl Virus",
         "Healthy"
-    ]
+    ],
+    "last_conv_layer": "conv5_block16_concat"
 }
