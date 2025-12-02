@@ -1,0 +1,17 @@
+{
+    "best_model_name": "DenseNet121",
+    "num_classes": 10,
+    "image_size": [224, 224],
+    "class_names": [
+        "Bacterial Spot",
+        "Early Blight",
+        "Late Blight",
+        "Leaf Mold",
+        "Septoria Leaf Spot",
+        "Spider Mites",
+        "Target Spot",
+        "Mosaic Virus",
+        "Yellow Leaf Curl Virus",
+        "Healthy"
+    ]
+}
