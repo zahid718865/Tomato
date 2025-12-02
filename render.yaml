@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: tomato-bot
+    name: TomatoBotDocker
     env: docker
+    repo: https://github.com/zahid718865/Tomato
+    branch: main
     plan: free
     dockerfilePath: ./Dockerfile
-    region: oregon
-    numInstances: 1
-    healthCheckPath: /
+    autoDeploy: true
