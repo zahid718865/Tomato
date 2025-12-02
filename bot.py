@@ -6,22 +6,28 @@ from PIL import Image
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup
 
+# -------------------------------------------------------
 # Logging
+# -------------------------------------------------------
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-# Read BOT TOKEN from Render environment variable
+# -------------------------------------------------------
+# BOT TOKEN
+# -------------------------------------------------------
 API_KEY = os.getenv("BOT_TOKEN")
 
 if not API_KEY:
     raise ValueError("❌ BOT_TOKEN environment variable not set in Render!")
 
+# -------------------------------------------------------
+# MODEL CONFIG
+# -------------------------------------------------------
 MODEL_PATH = "best_DenseNet121.h5"
-IMAGE_SIZE = (224, 224)
-
+IMAGE_SIZE = (256, 256)      # ✅ FIXED — matches your metadata
 CLASS_NAMES = [
     "Bacterial Spot",
     "Early Blight",
@@ -35,35 +41,44 @@ CLASS_NAMES = [
     "Healthy"
 ]
 
+# -------------------------------------------------------
+# Load Model
+# -------------------------------------------------------
 def load_model():
     logger.info("Loading model...")
-    model = tf.keras.models.load_model(MODEL_PATH)
+    model = tf.keras.models.load_model(MODEL_PATH, compile=False)
     logger.info("Model loaded!")
     return model
 
 model = load_model()
 
+# -------------------------------------------------------
+# Commands
+# -------------------------------------------------------
 def start(update, context):
     keyboard = [["Send Image"], ["Help"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
 
     update.message.reply_text(
         "🌱 Welcome to the Tomato Disease Detector Bot!\n"
-        "Send me a leaf photo and I will predict the disease.",
+        "Send me a tomato leaf photo and I will predict the disease.",
         reply_markup=reply_markup,
     )
 
 def help_command(update, context):
     update.message.reply_text(
         "📌 *How to use the bot:*\n"
-        "1️⃣ Take a tomato leaf photo\n"
-        "2️⃣ Send it here\n"
+        "1️⃣ Send a tomato leaf image\n"
+        "2️⃣ Wait a few seconds\n"
         "3️⃣ Get prediction instantly 🌿",
         parse_mode="Markdown"
     )
 
+# -------------------------------------------------------
+# Prediction
+# -------------------------------------------------------
 def predict_image(img):
-    img = img.resize(IMAGE_SIZE)
+    img = img.resize(IMAGE_SIZE)          # ✅ FIXED SIZE
     img = np.array(img) / 255.0
     img = np.expand_dims(img, axis=0)
 
@@ -72,6 +87,9 @@ def predict_image(img):
     confidence = preds[class_id] * 100
     return CLASS_NAMES[class_id], confidence
 
+# -------------------------------------------------------
+# Handle incoming photos
+# -------------------------------------------------------
 def handle_image(update, context):
     try:
         photo_file = update.message.photo[-1].get_file()
@@ -82,8 +100,8 @@ def handle_image(update, context):
         label, confidence = predict_image(img)
 
         update.message.reply_text(
-            f"🔍 *Prediction: {label}*\n"
-            f"📊 Confidence: {confidence:.2f}% 🌡️",
+            f"🔍 *Prediction:* {label}\n"
+            f"📊 *Confidence:* {confidence:.2f}%",
             parse_mode="Markdown"
         )
 
@@ -91,6 +109,9 @@ def handle_image(update, context):
         logger.error(f"Error: {e}")
         update.message.reply_text("❌ Something went wrong. Try again.")
 
+# -------------------------------------------------------
+# Run Bot
+# -------------------------------------------------------
 def main():
     updater = Updater(API_KEY, use_context=True)
     dp = updater.dispatcher
